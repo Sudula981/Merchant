@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merchant Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        h1 {
+            color: #2c3e50;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 90%;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #message, #uploadMessage, #bulkUploadMessage {
+            margin-top: 20px;
+            font-size: 18px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loginContainer" class="container">
+        <h1>Merchant Login</h1>
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required><br><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" required><br><br>
+
+            <button type="submit">Login</button>
+        </form>
+        <div id="message"></div>
+    </div>
+
+    <div id="catalogueContainer" class="container hidden">
+        <h1>Create Catalogue</h1>
+        <button onclick="showBulkUpload()">Bulk Upload</button>
+        <button onclick="showAddProducts()">Add Products</button>
+        <button onclick="showOrders()">Orders</button>
+        <button onclick="showAddSellers()">Add Sellers</button>
+        <button onclick="showAddBuyers()">Add Buyers</button>
+        <button onclick="backToLogin()">Logout</button>
+    </div>
+
+    <div id="bulkUploadContainer" class="container hidden">
+        <h1>Bulk Upload</h1>
+        <input type="file" id="fileInput" multiple>
+        <button onclick="uploadFiles()">Upload</button>
+        <button onclick="backToCatalogue()">Back</button>
+        <div id="uploadMessage"></div>
+    </div>
+
+    <div id="addProductsContainer" class="container hidden">
+        <h1>Add Products</h1>
+        <button onclick="redirectToAddProductPage()">Create New</button>
+        <button onclick="backToCatalogue()">Back</button>
+    </div>
+
+    <div id="addProductPage" class="container hidden">
+        <h1>Add New Product</h1>
+        <input type="text" id="productName" placeholder="Product Name" required>
+        <input type="text" id="weight" placeholder="Weight" required>
+        <input type="text" id="subcategory" placeholder="Sub Category" required>
+        <input type="text" id="basicPrice" placeholder="Basic Price" required>
+        <input type="text" id="gst" placeholder="GST" required>
+        <input type="text" id="loadingPrice" placeholder="Loading Price" required>
+        <input type="text" id="maxOrderQty" placeholder="Max Order Qty" required>
+        <input type="text" id="minOrderQty" placeholder="Min Order Qty" required>
+        <input type="text" id="discount" placeholder="Discount" required>
+        <input type="file" id="productImage" accept="image/*">
+        <button onclick="addProduct()">Add</button>
+        <button onclick="backToAddProducts()">Back</button>
+    </div>
+
+    <div id="productListContainer" class="container hidden">
+        <h1>Product List</h1>
+        <table id="productTable">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Weight</th>
+                    <th>Sub Category</th>
+                    <th>Basic Price</th>
+                    <th>GST</th>
+                    <th>Loading Price</th>
+                    <th>Max Order Qty</th>
+                    <th>Min Order Qty</th>
+                    <th>Discount</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody"></tbody>
+        </table>
+        <button onclick="backToAddProducts()">Back</button>
+    </div>
+
+    <div id="ordersContainer" class="container hidden">
+        <h1>Orders</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Order ID</th>
+                    <th>Retailer Name</th>
+                    <th>Date & Time</th>
+                    <th>Order Value</th>
+                    <th>Purchase Order</th>
+                </tr>
+            </thead>
+            <tbody id="ordersTableBody"></tbody>
+        </table>
+        <h3>Add New Order</h3>
+        <input type="text" id="orderId" placeholder="Order ID" required>
+        <input type="text" id="retailerName" placeholder="Retailer Name" required>
+        <input type="datetime-local" id="dateTime" required>
+        <input type="text" id="orderValue" placeholder="Order Value" required>
+        <input type="text" id="purchaseOrder" placeholder="Purchase Order" required>
+        <button onclick="addOrder()">Add Order</button>
+        <button onclick="backToCatalogue()">Back</button>
+    </div>
+
+    <div id="addSellersContainer" class="container hidden">
+        <h1>Add Sellers</h1>
+        <p>Add Sellers page (placeholder).</p>
+        <button onclick="backToCatalogue()">Back</button>
+    </div>
+
+    <div id="addBuyersContainer" class="container hidden">
+        <h1>Add Buyers</h1>
+        <button onclick="showAddBuyersOptions()">Add Buyers</button>
+        <button onclick="showBulkUploadBuyers()">Bulk Upload</button>
+        <button onclick="backToCatalogue()">Back</button>
+    </div>
+
+    <div id="addBuyersPage" class="container hidden">
+        <h1>Add New Buyer</h1>
+        <input type="text" id="buyerName" placeholder="Name" required>
+        <input type="text" id="businessName" placeholder="Business Name" required>
+        <input type="text" id="gstNumber" placeholder="GST Number" required>
+        <input type="text" id="officeAddress" placeholder="Office Address" required>
+        <input type="text" id="deliveryAddress" placeholder="Delivery Address" required>
+        <div>
+            <label>
+                <input type="radio" name="membershipStatus" value="Non-member"> Non-member
+            </label>
+            <label>
+                <input type="radio" name="membershipStatus" value="One-member"> One-member
+            </label>
+        </div>
+        <button onclick="addBuyer()">Add</button>
+        <button onclick="backToAddBuyers()">Back</button>
+    </div>
+
+    <div id="bulkUploadBuyersContainer" class="container hidden">
+        <h1>Bulk Upload Buyers</h1>
+        <input type="file" id="bulkFileInput" multiple>
+        <button onclick="uploadBulkBuyers()">Upload</button>
+        <button onclick="backToAddBuyers()">Back</button>
+        <div id="bulkUploadMessage"></div>
+    </div>
+
+    <script>
+        let orderCount = 0; // To keep track of the number of orders
+        let productList = []; // To store added products
+
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('catalogueContainer').classList.remove('hidden');
+        });
+
+        function showBulkUpload() {
+            document.getElementById('catalogueContainer').classList.add('hidden');
+            document.getElementById('bulkUploadContainer').classList.remove('hidden');
+        }
+
+        function showAddProducts() {
+            document.getElementById('catalogueContainer').classList.add('hidden');
+            document.getElementById('addProductsContainer').classList.remove('hidden');
+        }
+
+        function showOrders() {
+            document.getElementById('catalogueContainer').classList.add('hidden');
+            document.getElementById('ordersContainer').classList.remove('hidden');
+        }
+
+        function showAddSellers() {
+            document.getElementById('catalogueContainer').classList.add('hidden');
+            document.getElementById('addSellersContainer').classList.remove('hidden');
+        }
+
+        function showAddBuyers() {
+            document.getElementById('catalogueContainer').classList.add('hidden');
+            document.getElementById('addBuyersContainer').classList.remove('hidden');
+        }
+
+        function backToLogin() {
+            document.getElementById('catalogueContainer').classList.add('hidden');
+            document.getElementById('bulkUploadContainer').classList.add('hidden');
+            document.getElementById('addProductsContainer').classList.add('hidden');
+            document.getElementById('ordersContainer').classList.add('hidden');
+            document.getElementById('addSellersContainer').classList.add('hidden');
+            document.getElementById('addBuyersContainer').classList.add('hidden');
+            document.getElementById('addBuyersPage').classList.add('hidden');
+            document.getElementById('bulkUploadBuyersContainer').classList.add('hidden');
+            document.getElementById('loginContainer').classList.remove('hidden');
+            document.getElementById('message').innerText = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function uploadFiles() {
+            const files = document.getElementById('fileInput').files;
+            if (files.length > 0) {
+                alert(`Uploading ${files.length} file(s)...`);
+                for (const file of files) {
+                    console.log(`Uploaded: ${file.name}`);
+                }
+                document.getElementById('uploadMessage').innerText = `${files.length} file(s) uploaded successfully.`;
+            } else {
+                alert('No files selected.');
+            }
+        }
+
+        function addProduct() {
+            const productName = document.getElementById('productName').value;
+            const weight = document.getElementById('weight').value;
+            const subcategory = document.getElementById('subcategory').value;
+            const basicPrice = document.getElementById('basicPrice').value;
+            const gst = document.getElementById('gst').value;
+            const loadingPrice = document.getElementById('loadingPrice').value;
+            const maxOrderQty = document.getElementById('maxOrderQty').value;
+            const minOrderQty = document.getElementById('minOrderQty').value;
+            const discount = document.getElementById('discount').value;
+            const productImage = document.getElementById('productImage').files[0];
+
+            if (productName && weight && subcategory && basicPrice && gst && loadingPrice && maxOrderQty && minOrderQty && discount && productImage) {
+                const newProduct = {
+                    productName,
+                    weight,
+                    subcategory,
+                    basicPrice,
+                    gst,
+                    loadingPrice,
+                    maxOrderQty,
+                    minOrderQty,
+                    discount,
+                    productImageName: productImage.name
+                };
+                
+                productList.push(newProduct);
+                displayProducts();
+                alert('Added product to catalogue!');
+                backToAddProducts();
+            } else {
+                alert('Please fill all fields and upload an image.');
+            }
+        }
+
+        function displayProducts() {
+            const tableBody = document.getElementById('productTableBody');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            productList.forEach((product) => {
+                const newRow = tableBody.insertRow();
+                newRow.innerHTML = `
+                    <td>${product.productName}</td>
+                    <td>${product.weight}</td>
+                    <td>${product.subcategory}</td>
+                    <td>${product.basicPrice}</td>
+                    <td>${product.gst}</td>
+                    <td>${product.loadingPrice}</td>
+                    <td>${product.maxOrderQty}</td>
+                    <td>${product.minOrderQty}</td>
+                    <td>${product.discount}</td>
+                `;
+            });
+
+            document.getElementById('productListContainer').classList.remove('hidden');
+        }
+
+        function addOrder() {
+            const orderId = document.getElementById('orderId').value;
+            const retailerName = document.getElementById('retailerName').value;
+            const dateTime = document.getElementById('dateTime').value;
+            const orderValue = document.getElementById('orderValue').value;
+            const purchaseOrder = document.getElementById('purchaseOrder').value;
+
+            if (orderId && retailerName && dateTime && orderValue && purchaseOrder) {
+                const tableBody = document.getElementById('ordersTableBody');
+                orderCount++; // Increment the order count
+                const newRow = tableBody.insertRow();
+                newRow.innerHTML = `
+                    <td>${orderCount}</td>
+                    <td>${orderId}</td>
+                    <td>${retailerName}</td>
+                    <td>${dateTime}</td>
+                    <td>${orderValue}</td>
+                    <td>${purchaseOrder}</td>
+                `;
+                alert('Order added successfully!');
+                document.getElementById('orderId').value = '';
+                document.getElementById('retailerName').value = '';
+                document.getElementById('dateTime').value = '';
+                document.getElementById('orderValue').value = '';
+                document.getElementById('purchaseOrder').value = '';
+            } else {
+                alert('Please fill all fields.');
+            }
+        }
+
+        function addBuyer() {
+            const buyerName = document.getElementById('buyerName').value;
+            const businessName = document.getElementById('businessName').value;
+            const gstNumber = document.getElementById('gstNumber').value;
+            const officeAddress = document.getElementById('officeAddress').value;
+            const deliveryAddress = document.getElementById('deliveryAddress').value;
+            const membershipStatus = document.querySelector('input[name="membershipStatus"]:checked');
+
+            if (buyerName && businessName && gstNumber && officeAddress && deliveryAddress) {
+                const membership = membershipStatus ? membershipStatus.value : 'None';
+                alert(`Added Buyer: ${buyerName}`);
+                console.log(`Buyer Details:
+                    Name: ${buyerName},
+                    Business Name: ${businessName},
+                    GST Number: ${gstNumber},
+                    Office Address: ${officeAddress},
+                    Delivery Address: ${deliveryAddress},
+                    Membership Status: ${membership}`);
+                backToAddBuyers();
+            } else {
+                alert('Please fill all fields.');
+            }
+        }
+
+        function uploadBulkBuyers() {
+            const files = document.getElementById('bulkFileInput').files;
+            if (files.length > 0) {
+                alert(`Uploading ${files.length} file(s)...`);
+                for (const file of files) {
+                    console.log(`Uploaded: ${file.name}`);
+                }
+                document.getElementById('bulkUploadMessage').innerText = `${files.length} file(s) uploaded successfully.`;
+            } else {
+                alert('No files selected.');
+            }
+        }
+
+        function redirectToAddProductPage() {
+            document.getElementById('addProductsContainer').classList.add('hidden');
+            document.getElementById('addProductPage').classList.remove('hidden');
+        }
+
+        function backToCatalogue() {
+            document.getElementById('bulkUploadContainer').classList.add('hidden');
+            document.getElementById('addProductsContainer').classList.add('hidden');
+            document.getElementById('ordersContainer').classList.add('hidden');
+            document.getElementById('addSellersContainer').classList.add('hidden');
+            document.getElementById('addBuyersContainer').classList.add('hidden');
+            document.getElementById('addBuyersPage').classList.add('hidden');
+            document.getElementById('bulkUploadBuyersContainer').classList.add('hidden');
+            document.getElementById('catalogueContainer').classList.remove('hidden');
+        }
+
+        function backToAddProducts() {
+            document.getElementById('addProductPage').classList.add('hidden');
+            document.getElementById('addProductsContainer').classList.remove('hidden');
+        }
+
+        function showAddBuyersOptions() {
+            document.getElementById('addBuyersContainer').classList.add('hidden');
+            document.getElementById('addBuyersPage').classList.remove('hidden');
+        }
+
+        function showBulkUploadBuyers() {
+            document.getElementById('addBuyersContainer').classList.add('hidden');
+            document.getElementById('bulkUploadBuyersContainer').classList.remove('hidden');
+        }
+
+        function backToAddBuyers() {
+            document.getElementById('addBuyersPage').classList.add('hidden');
+            document.getElementById('addBuyersContainer').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
